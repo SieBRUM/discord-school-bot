@@ -157,6 +157,7 @@
     <Compile Include="Modules\Commands\General.cs" />
     <Compile Include="Modules\Helpers\APIHelper.cs" />
     <Compile Include="Modules\Helpers\CustomEmbedBuilder.cs" />
+    <Compile Include="Modules\Helpers\LogHelper.cs" />
     <Compile Include="Modules\Helpers\RankHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

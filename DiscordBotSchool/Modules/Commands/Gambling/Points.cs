@@ -27,7 +27,7 @@ namespace DiscordBotSchool.Modules.Commands
         {
             var response = APIHelper.MakeGetRequest($"users/{user.Id}");
             BackendUser dbuser = JsonConvert.DeserializeObject<BackendUser>(response);
-            RankHelper.UpdateRank(dbuser, Context.Guild.GetUser(Context.User.Id), Context);
+            RankHelper.UpdateRank(dbuser, user, Context);
 
             await ReplyAsync($"{user.Mention} has {string.Format("{0:C}", dbuser.Points)}!");
         }
@@ -36,17 +36,6 @@ namespace DiscordBotSchool.Modules.Commands
         public async Task GivePoints(SocketGuildUser user, [Remainder]long points)
         {
             await ReplyAsync($"{Context.User.Mention} fuck off");
-
-            //BackendUser dbUser = new BackendUser()
-            //{
-            //    DiscordId = (long)user.Id,
-            //    Points = points
-            //};
-
-            //string response = APIHelper.MakePostCall("users", dbUser);
-
-            //BackendUser dbuser = JsonConvert.DeserializeObject<BackendUser>(response);
-            //await ReplyAsync($"{user.Mention} has {string.Format("{0:C}", dbuser.Points)}!");
         }
 
         [Command("highscore")]

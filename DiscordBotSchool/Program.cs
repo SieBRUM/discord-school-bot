@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using LoggingInfo;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
@@ -77,8 +78,9 @@ namespace DiscordBotSchool
                     Console.WriteLine(result.ErrorReason);
                     Console.ResetColor();
                 }
-        }
-    }
 
+                LogHelper.WriteLog(result.IsSuccess, context, message.Content, result.ErrorReason);
+            }
+        }
     }
 }
