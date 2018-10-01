@@ -18,6 +18,7 @@ namespace DiscordBotSchool.Mapping
         ChallengeAlreadyExists,
         ChallengeRequestSet,
         ChallengeDoesntExist,
+        ChallengeDeclined,
         UnknownError
     }
 

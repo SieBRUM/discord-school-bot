@@ -79,5 +79,29 @@ namespace DiscordBotSchool.Modules.Commands
 
             await ReplyAsync(emojiText);
         }
+
+        [Command("subscribe")]
+        public async Task SubscribeToMessages()
+        {
+            var user = Context.Guild.GetUser(Context.User.Id);
+            if (user.Roles.Contains(Context.Guild.Roles.Where(x => x.Name == "BotNews").FirstOrDefault()))
+                await ReplyAsync($"{Context.User.Mention} already subscribed.");
+            else
+                await user.AddRoleAsync(Context.Guild.Roles.Where(x => x.Name == "BotNews").FirstOrDefault());
+
+            await ReplyAsync($"{Context.User.Mention} subscribed.");
+        }
+
+        [Command("unsubscribe")]
+        public async Task UnsubscribeToMessages()
+        {
+            var user = Context.Guild.GetUser(Context.User.Id);
+            if (!user.Roles.Contains(Context.Guild.Roles.Where(x => x.Name == "BotNews").FirstOrDefault()))
+                await ReplyAsync($"{Context.User.Mention} not subscribed.");
+            else
+                await user.RemoveRoleAsync(Context.Guild.Roles.Where(x => x.Name == "BotNews").FirstOrDefault());
+
+            await ReplyAsync($"{Context.User.Mention} unsubscribed.");
+        }
     }
 }

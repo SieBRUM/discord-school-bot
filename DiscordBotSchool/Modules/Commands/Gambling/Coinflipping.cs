@@ -36,7 +36,6 @@ namespace DiscordBotSchool.Modules.Commands
             coinflipUser = JsonConvert.DeserializeObject<CoinflipResult>(response);
             RankHelper.UpdateRank(coinflipUser.User, Context.Guild.GetUser(Context.User.Id), Context);
 
-
             if (coinflipUser.Result == CoinflipResults.Lost)
             {
                 await ReplyAsync($"{Context.User.Mention} has lost and now has {string.Format("{0:C}", coinflipUser.User.Points)}!");
@@ -83,7 +82,7 @@ namespace DiscordBotSchool.Modules.Commands
             string response = APIHelper.MakePostCall("gamble/coinflipvs", coinflip);
             coinflip = JsonConvert.DeserializeObject<BackendCoinflip>(response);
             RankHelper.UpdateRank(coinflip.Challenger, Context.Guild.GetUser(Context.User.Id), Context);
-            RankHelper.UpdateRank(coinflip.Enemy, Context.Guild.GetUser(Context.User.Id), Context);
+            RankHelper.UpdateRank(coinflip.Enemy, Context.Guild.GetUser(enemy.Id), Context);
 
 
             switch (coinflip.Result)
@@ -122,7 +121,7 @@ namespace DiscordBotSchool.Modules.Commands
             coinflip = JsonConvert.DeserializeObject<BackendCoinflip>(response);
 
             RankHelper.UpdateRank(coinflip.Challenger, Context.Guild.GetUser(Context.User.Id), Context);
-            RankHelper.UpdateRank(coinflip.Enemy, Context.Guild.GetUser(Context.User.Id), Context);
+            RankHelper.UpdateRank(coinflip.Enemy, Context.Guild.GetUser(challenger.Id), Context);
 
             switch (coinflip.Result)
             {
@@ -140,6 +139,41 @@ namespace DiscordBotSchool.Modules.Commands
                     break;
                 case CoinflipVsResults.ChallengeDoesntExist:
                     await ReplyAsync($"{Context.User.Mention} you don't have a challenge vs {challenger.Username}!");
+                    break;
+                case CoinflipVsResults.UnknownError:
+                    await ReplyAsync($"{Context.User.Mention} An unknown error occured!");
+                    break;
+                case CoinflipVsResults.ChallengeDeclined:
+                    await ReplyAsync($"{Context.User.Mention} Declined!");
+                    break;
+                default:
+                    await ReplyAsync($"{Context.User.Mention} An unknown error occured!");
+                    break;
+            }
+        }
+
+        [Command("decline")]
+        public async Task DeclineCoinflipChallenge(SocketGuildUser challenger)
+        {
+            BackendCoinflip coinflip = new BackendCoinflip()
+            {
+                Challenger = new BackendUser() { DiscordId = (long)challenger.Id },
+                Enemy = new BackendUser() { DiscordId = (long)Context.User.Id }
+            };
+
+            string response = APIHelper.MakePostCall("gamble/declinecoinflip", coinflip);
+            coinflip = JsonConvert.DeserializeObject<BackendCoinflip>(response);
+
+            RankHelper.UpdateRank(coinflip.Challenger, Context.Guild.GetUser(Context.User.Id), Context);
+            RankHelper.UpdateRank(coinflip.Enemy, Context.Guild.GetUser(challenger.Id), Context);
+
+            switch (coinflip.Result)
+            {
+                case CoinflipVsResults.ChallengeDeclined:
+                    await ReplyAsync($"{Context.User.Mention} has declined the duel vs {challenger.Mention}!");
+                    break;
+                case CoinflipVsResults.ChallengeDoesntExist:
+                    await ReplyAsync($"{Context.User.Mention} you dont have a match vs {challenger.Mention}!");
                     break;
                 case CoinflipVsResults.UnknownError:
                     await ReplyAsync($"{Context.User.Mention} An unknown error occured!");

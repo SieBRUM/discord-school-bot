@@ -48,7 +48,7 @@ namespace DiscordBotSchool.Modules.Helpers
 
         private static async void RemoveRanks(BackendUser Backend, SocketGuildUser user, SocketCommandContext Context)
         {
-            List<SocketRole> list = Context.Guild.Roles.Where(x => x.Name != "Admin" && x.Name != "@everyone" && x.Name != "School bot" && user.Roles.Contains(x)).ToList();
+            List<SocketRole> list = Context.Guild.Roles.Where(x => x != null && x.Name != "Admin" && x.Name != "@everyone" && x.Name != "BotNews" && x.Name != "School bot" && user != null && user.Roles != null && user.Roles.Contains(x)).ToList();
 
             if(list.Contains(list.Where(x => x.Name == "Quinten").FirstOrDefault()) && !(Backend.Points > 100))
             {

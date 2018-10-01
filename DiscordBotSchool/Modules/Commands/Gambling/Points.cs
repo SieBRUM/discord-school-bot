@@ -11,7 +11,7 @@ namespace DiscordBotSchool.Modules.Commands
 {
     public class Points : ModuleBase<SocketCommandContext>
     {
-        [Command("points")]
+        [Command("points"), Alias("Money", "Point")]
         public async Task GetPoints()
         {
             var response = APIHelper.MakeGetRequest($"users/{Context.User.Id}");
@@ -22,7 +22,7 @@ namespace DiscordBotSchool.Modules.Commands
             await ReplyAsync($"{Context.User.Mention} has {string.Format("{0:C}", dbuser.Points)}!");
         }
 
-        [Command("points")]
+        [Command("points"), Alias("Money", "Point")]
         public async Task GetPoints(SocketGuildUser user)
         {
             var response = APIHelper.MakeGetRequest($"users/{user.Id}");
@@ -38,7 +38,7 @@ namespace DiscordBotSchool.Modules.Commands
             await ReplyAsync($"{Context.User.Mention} fuck off");
         }
 
-        [Command("highscore")]
+        [Command("highscore"), Alias("highscores", "top")]
         public async Task GetHighscores()
         {
             EmbedBuilder builder = new EmbedBuilder();
@@ -60,7 +60,7 @@ namespace DiscordBotSchool.Modules.Commands
             await ReplyAsync("", false, builder.Build());
         }
 
-        [Command("pay")]
+        [Command("pay"), Alias("donate", "give")]
         public async Task PayMoney(SocketGuildUser user, long points)
         {
             if (points < 1)
@@ -69,35 +69,35 @@ namespace DiscordBotSchool.Modules.Commands
                 return;
             }
 
-            BackendCoinflip coinflip = new BackendCoinflip()
+            BackendDonation donation = new BackendDonation()
             {
-                Challenger = new BackendUser() { DiscordId = (long)Context.User.Id },
-                Enemy = new BackendUser() { DiscordId = (long)user.Id },
+                Donator = new BackendUser() { DiscordId = (long)Context.User.Id },
+                Receiver = new BackendUser() { DiscordId = (long)user.Id },
                 Points = points,
             };
 
 
-            string response = APIHelper.MakePostCall("pay", coinflip);
-            coinflip = JsonConvert.DeserializeObject<BackendCoinflip>(response);
+            string response = APIHelper.MakePostCall("pay", donation);
+            donation = JsonConvert.DeserializeObject<BackendDonation>(response);
 
-            RankHelper.UpdateRank(coinflip.Challenger, Context.Guild.GetUser(Context.User.Id), Context);
-            RankHelper.UpdateRank(coinflip.Enemy, Context.Guild.GetUser(Context.User.Id), Context);
+            RankHelper.UpdateRank(donation.Donator, Context.Guild.GetUser(Context.User.Id), Context);
+            RankHelper.UpdateRank(donation.Receiver, Context.Guild.GetUser(user.Id), Context);
 
-            switch (coinflip.Result)
+            switch (donation.Result)
             {
-                case CoinflipVsResults.ChallengeDoesntExist:
+                case DonationResult.DonatorDoesntExist:
                     await ReplyAsync($"{Context.User.Mention} doesn't exist in database!");
                     break;
-                case CoinflipVsResults.EnemyWon:
+                case DonationResult.ReceiverDoesntExist:
                     await ReplyAsync($"{user.Mention} doesn't exist in database!");
                     break;
-                case CoinflipVsResults.ChallengerNoPoints:
-                    await ReplyAsync($"{Context.User.Mention} can't affort to donate this much! (max {string.Format("{0:C}", coinflip.Challenger.Points)})");
+                case DonationResult.DonatorNoMoney:
+                    await ReplyAsync($"{Context.User.Mention} can't affort to donate this much! (max {string.Format("{0:C}", donation.Donator.Points)})");
                     break;
-                case CoinflipVsResults.ChallengerWon:
-                    await ReplyAsync($"{Context.User.Mention} has donated {string.Format("{0:C}", coinflip.Points)} to {user.Mention}!");
+                case DonationResult.DonationSuccesful:
+                    await ReplyAsync($"{Context.User.Mention} has donated {string.Format("{0:C}", donation.Points)} to {user.Mention}!");
                     break;
-                case CoinflipVsResults.UnknownError:
+                case DonationResult.UnknownError:
                     await ReplyAsync($"{Context.User.Mention} An unknown error occured.");
                     break;
                 default:

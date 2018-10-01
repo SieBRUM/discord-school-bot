@@ -139,6 +139,7 @@
       <HintPath>..\packages\System.Security.Cryptography.X509Certificates.4.3.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
     </Reference>
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -150,9 +151,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Mapping\BackendCoinflip.cs" />
+    <Compile Include="Mapping\BackendDonation.cs" />
     <Compile Include="Mapping\BackendUser.cs" />
     <Compile Include="Mapping\CoinflipResult.cs" />
     <Compile Include="Modules\Commands\Gambling\Coinflipping.cs" />
+    <Compile Include="Modules\Commands\Gambling\Jackpot.cs" />
     <Compile Include="Modules\Commands\Gambling\Points.cs" />
     <Compile Include="Modules\Commands\General.cs" />
     <Compile Include="Modules\Helpers\APIHelper.cs" />
@@ -161,6 +164,7 @@
     <Compile Include="Modules\Helpers\RankHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\JackpotService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

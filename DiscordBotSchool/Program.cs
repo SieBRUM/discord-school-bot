@@ -1,12 +1,15 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBotSchool.Modules.Commands.Gambling;
+using DiscordBotSchool.Services;
 using LoggingInfo;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DiscordBotSchool
 {
@@ -17,15 +20,18 @@ namespace DiscordBotSchool
 
         private DiscordSocketClient _client;
         private CommandService _commands;
+        private JackpotService _timer;
         private IServiceProvider _services;
         public async Task RunBotAsync()
         {
             _client = new DiscordSocketClient();
             _commands = new CommandService();
+            _timer = new JackpotService(_client);
 
             _services = new ServiceCollection()
                 .AddSingleton(_client)
                 .AddSingleton(_commands)
+                .AddSingleton(_timer)
                 .BuildServiceProvider();
 
             // Get bot token
@@ -65,8 +71,6 @@ namespace DiscordBotSchool
 
             int argPos = 0;
 
-
-            // temp disable prefixes cuz lazy
             if (message.HasStringPrefix("!", ref argPos) || message.HasMentionPrefix(_client.CurrentUser, ref argPos))
             {
                 var context = new SocketCommandContext(_client, message);
