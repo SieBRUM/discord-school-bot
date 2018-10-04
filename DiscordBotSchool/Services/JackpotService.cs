@@ -1,5 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using DiscordBotSchool.Mapping;
+using DiscordBotSchool.Modules.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Threading;
 
@@ -8,10 +11,13 @@ namespace DiscordBotSchool.Services
     public class JackpotService
     {
 
-        private readonly ulong CHANNEL_ID = 487166975794085888;
+        private readonly ulong CHANNEL_ID = 484640211519799308;
+        private const int SECONDS = 5;
+        private const int SECOND_ROTATIONS = 5;
         private readonly Timer _timer;
 
         private int TimerCompleted = 0;
+        private bool IsLocked = false;
                                                                    
         public JackpotService(DiscordSocketClient client)
         {
@@ -20,16 +26,17 @@ namespace DiscordBotSchool.Services
                 var chan = client.GetChannel(CHANNEL_ID) as IMessageChannel;
                 if (chan != null)
                 {
-                    TimerCompleted++;
-                    if(TimerCompleted > 3)
+                    if(TimerCompleted > SECOND_ROTATIONS)
                     {
                         _timer.Change(Timeout.Infinite, Timeout.Infinite);
-                        await chan.SendMessageAsync("jackpot closed!");
+                        await chan.SendMessageAsync("Jackpot closed!");
                         TimerCompleted = 0;
+                        CloseJackpot();
                     }
                     else
                     {
-                        await chan.SendMessageAsync($"Jackpot closing in {15 / TimerCompleted} seconds!");
+                        await chan.SendMessageAsync($"Jackpot closing in {(SECONDS * SECOND_ROTATIONS) - (SECONDS * TimerCompleted) + SECONDS} seconds!");
+                        TimerCompleted++;
                     }
                 }
             },
@@ -43,9 +50,46 @@ namespace DiscordBotSchool.Services
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
-        public void Restart()
+        private void Restart()
         {
-            _timer.Change(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(5));
+            if(!IsLocked)
+                _timer.Change(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(SECONDS));
+        }
+
+        public BackendJackpot RequestJackpot(BackendJackpot jackpot)
+        {
+            if (IsLocked)
+                return null;
+
+            // Do some init
+            if(TimerCompleted == 0)
+            {
+                return UpdateJackpot(jackpot);
+            }
+            else
+            {
+                TimerCompleted = 0;
+                return UpdateJackpot(jackpot);
+            }
+        }
+
+        private BackendJackpot UpdateJackpot(BackendJackpot jackpot)
+        {
+            // API call
+            Restart();
+            string response = APIHelper.MakePostCall("gamble/updatejackpot", jackpot);
+            return JsonConvert.DeserializeObject<BackendJackpot>(response);
+
+        }
+
+        private void CloseJackpot()
+        {
+            // Actions should be queue'd but just to be sure..
+            IsLocked = true;
+            // API call
+            string response = APIHelper.MakeGetRequest("gamble/endjackpot");
+            BackendJackpot jackpot = JsonConvert.DeserializeObject<BackendJackpot>(response);
+            IsLocked = false;
         }
     }
 }

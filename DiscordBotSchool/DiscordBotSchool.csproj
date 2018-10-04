@@ -150,6 +150,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mapping\BackendJackpot.cs" />
     <Compile Include="Mapping\BackendCoinflip.cs" />
     <Compile Include="Mapping\BackendDonation.cs" />
     <Compile Include="Mapping\BackendUser.cs" />
