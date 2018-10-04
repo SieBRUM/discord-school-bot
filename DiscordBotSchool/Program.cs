@@ -1,7 +1,6 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotSchool.Modules.Commands.Gambling;
 using DiscordBotSchool.Services;
 using LoggingInfo;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +8,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace DiscordBotSchool
 {

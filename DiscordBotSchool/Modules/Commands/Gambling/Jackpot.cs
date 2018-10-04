@@ -1,9 +1,5 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
+﻿using Discord.Commands;
 using DiscordBotSchool.Services;
-using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace DiscordBotSchool.Modules.Commands.Gambling

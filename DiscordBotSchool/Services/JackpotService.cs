@@ -8,9 +8,11 @@ namespace DiscordBotSchool.Services
     public class JackpotService
     {
 
-        private readonly ulong CHANNEL_ID = 487166975794085888;
-        private readonly Timer _timer;
+        private readonly ulong CHANNEL_ID = 484640211519799308;
+        private const int SECONDS = 5;
+        private const int SECOND_ROTATIONS = 5;
 
+        private readonly Timer _timer;
         private int TimerCompleted = 0;
                                                                    
         public JackpotService(DiscordSocketClient client)
@@ -20,16 +22,16 @@ namespace DiscordBotSchool.Services
                 var chan = client.GetChannel(CHANNEL_ID) as IMessageChannel;
                 if (chan != null)
                 {
-                    TimerCompleted++;
-                    if(TimerCompleted > 3)
+                    if(TimerCompleted > SECOND_ROTATIONS)
                     {
                         _timer.Change(Timeout.Infinite, Timeout.Infinite);
-                        await chan.SendMessageAsync("jackpot closed!");
+                        await chan.SendMessageAsync("Jackpot closed!");
                         TimerCompleted = 0;
                     }
                     else
                     {
-                        await chan.SendMessageAsync($"Jackpot closing in {15 / TimerCompleted} seconds!");
+                        await chan.SendMessageAsync($"Jackpot closing in {(SECONDS * SECOND_ROTATIONS) - (SECONDS * TimerCompleted) + SECONDS} seconds!");
+                        TimerCompleted++;
                     }
                 }
             },
@@ -45,7 +47,7 @@ namespace DiscordBotSchool.Services
 
         public void Restart()
         {
-            _timer.Change(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(5));
+            _timer.Change(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(SECONDS));
         }
     }
 }
