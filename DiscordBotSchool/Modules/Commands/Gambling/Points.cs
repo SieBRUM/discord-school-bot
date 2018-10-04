@@ -71,8 +71,8 @@ namespace DiscordBotSchool.Modules.Commands
 
             BackendDonation donation = new BackendDonation()
             {
-                Donator = new BackendUser() { DiscordId = (long)Context.User.Id },
-                Receiver = new BackendUser() { DiscordId = (long)user.Id },
+                Donator = new BackendUser() { DiscordId = (long)Context.User.Id, Username = Context.User.Username },
+                Receiver = new BackendUser() { DiscordId = (long)user.Id, Username = user.Username },
                 Points = points,
             };
 

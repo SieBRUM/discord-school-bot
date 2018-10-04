@@ -8,5 +8,6 @@
         public long BetsExecuted;
         public long BetsWon;
         public long BetsLost;
+        public string Username;
     }
 }

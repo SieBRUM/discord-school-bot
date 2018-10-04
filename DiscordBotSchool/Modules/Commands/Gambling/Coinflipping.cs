@@ -28,7 +28,7 @@ namespace DiscordBotSchool.Modules.Commands
 
             CoinflipResult coinflipUser = new CoinflipResult()
             {
-                User = new BackendUser() { DiscordId = (long)Context.User.Id, Points = points },
+                User = new BackendUser() { DiscordId = (long)Context.User.Id, Points = points, Username = Context.User.Username },
                 ChosenSide = (side.ToLower() == "heads" ? 1 : 0),
             };
 
@@ -73,8 +73,8 @@ namespace DiscordBotSchool.Modules.Commands
 
             BackendCoinflip coinflip = new BackendCoinflip()
             {
-                Challenger = new BackendUser() { DiscordId = (long)Context.User.Id },
-                Enemy = new BackendUser() { DiscordId = (long)enemy.Id },
+                Challenger = new BackendUser() { DiscordId = (long)Context.User.Id, Username = Context.User.Username },
+                Enemy = new BackendUser() { DiscordId = (long)enemy.Id, Username = enemy.Username },
                 Points = points,
                 Side = (side.ToLower() == "heads" ? 1 : 0)
             };
@@ -113,8 +113,8 @@ namespace DiscordBotSchool.Modules.Commands
         {
             BackendCoinflip coinflip = new BackendCoinflip()
             {
-                Challenger = new BackendUser() { DiscordId = (long)challenger.Id },
-                Enemy = new BackendUser() { DiscordId = (long)Context.User.Id }
+                Challenger = new BackendUser() { DiscordId = (long)challenger.Id, Username = challenger.Username },
+                Enemy = new BackendUser() { DiscordId = (long)Context.User.Id, Username = Context.User.Username }
             };
 
             string response = APIHelper.MakePostCall("gamble/acceptcoinflip", coinflip);
@@ -157,8 +157,8 @@ namespace DiscordBotSchool.Modules.Commands
         {
             BackendCoinflip coinflip = new BackendCoinflip()
             {
-                Challenger = new BackendUser() { DiscordId = (long)challenger.Id },
-                Enemy = new BackendUser() { DiscordId = (long)Context.User.Id }
+                Challenger = new BackendUser() { DiscordId = (long)challenger.Id, Username = challenger.Username },
+                Enemy = new BackendUser() { DiscordId = (long)Context.User.Id, Username = Context.User.Username }
             };
 
             string response = APIHelper.MakePostCall("gamble/declinecoinflip", coinflip);
