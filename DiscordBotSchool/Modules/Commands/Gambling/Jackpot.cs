@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using DiscordBotSchool.Mapping;
 using DiscordBotSchool.Services;
 using System.Threading.Tasks;
 
@@ -14,9 +15,26 @@ namespace DiscordBotSchool.Modules.Commands.Gambling
         }
 
         [Command("jackpot")]
-        public async Task AddJackpot(long points)
+        public async Task AddJackpot(long Points)
         {
-            _service.Restart();
+            BackendJackpot jackpot = new BackendJackpot()
+            {
+                Points = Points,
+                DiscordId = (long)Context.User.Id
+            };
+
+            jackpot = _service.RequestJackpot(jackpot);
+
+            if(jackpot == null)
+            {
+                // Error?
+            }
+            else
+            {
+                // Win percentage etc..
+                await ReplyAsync($"Total points: {jackpot.TotalPoints} | your total bet: {jackpot.Points} | your win percentage {jackpot.WinChancePercentage}");
+            }
         }
     }
 }
+    

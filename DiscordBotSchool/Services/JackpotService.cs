@@ -1,5 +1,8 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using DiscordBotSchool.Mapping;
+using DiscordBotSchool.Modules.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.Threading;
 
@@ -11,9 +14,10 @@ namespace DiscordBotSchool.Services
         private readonly ulong CHANNEL_ID = 484640211519799308;
         private const int SECONDS = 5;
         private const int SECOND_ROTATIONS = 5;
-
         private readonly Timer _timer;
+
         private int TimerCompleted = 0;
+        private bool IsLocked = false;
                                                                    
         public JackpotService(DiscordSocketClient client)
         {
@@ -27,6 +31,7 @@ namespace DiscordBotSchool.Services
                         _timer.Change(Timeout.Infinite, Timeout.Infinite);
                         await chan.SendMessageAsync("Jackpot closed!");
                         TimerCompleted = 0;
+                        CloseJackpot();
                     }
                     else
                     {
@@ -45,9 +50,46 @@ namespace DiscordBotSchool.Services
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
         }
 
-        public void Restart()
+        private void Restart()
         {
-            _timer.Change(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(SECONDS));
+            if(!IsLocked)
+                _timer.Change(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(SECONDS));
+        }
+
+        public BackendJackpot RequestJackpot(BackendJackpot jackpot)
+        {
+            if (IsLocked)
+                return null;
+
+            // Do some init
+            if(TimerCompleted == 0)
+            {
+                return UpdateJackpot(jackpot);
+            }
+            else
+            {
+                TimerCompleted = 0;
+                return UpdateJackpot(jackpot);
+            }
+        }
+
+        private BackendJackpot UpdateJackpot(BackendJackpot jackpot)
+        {
+            // API call
+            Restart();
+            string response = APIHelper.MakePostCall("gamble/updatejackpot", jackpot);
+            return JsonConvert.DeserializeObject<BackendJackpot>(response);
+
+        }
+
+        private void CloseJackpot()
+        {
+            // Actions should be queue'd but just to be sure..
+            IsLocked = true;
+            // API call
+            string response = APIHelper.MakeGetRequest("gamble/endjackpot");
+            BackendJackpot jackpot = JsonConvert.DeserializeObject<BackendJackpot>(response);
+            IsLocked = false;
         }
     }
 }
