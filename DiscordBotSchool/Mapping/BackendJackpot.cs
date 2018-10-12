@@ -9,6 +9,7 @@
         public long TotalPoints;
         public long DiscordId;
         public JackpotStatus Status;
+        public BackendUser User;
     }
 
     public enum JackpotStatus
@@ -20,5 +21,4 @@
         InvalidPoints,
         UnknownError
     }
-
 }

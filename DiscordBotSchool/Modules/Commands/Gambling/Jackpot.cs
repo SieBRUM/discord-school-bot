@@ -27,12 +27,23 @@ namespace DiscordBotSchool.Modules.Commands.Gambling
 
             if(jackpot == null)
             {
-                // Error?
+                await ReplyAsync($"{Context.User.Mention} An unknown error occured!");
+                return;
             }
-            else
+            switch (jackpot.Status)
             {
-                // Win percentage etc..
-                await ReplyAsync($"Total points: {jackpot.TotalPoints} | your total bet: {jackpot.Points} | your win percentage {jackpot.WinChancePercentage}");
+                case JackpotStatus.UserNotEnoughPoints:
+                    await ReplyAsync($"{Context.User.Mention} You do not have the points to make this bet (max {jackpot.User.Points})!");
+                    break;
+                case JackpotStatus.InvalidPoints:
+                    await ReplyAsync($"{Context.User.Mention} Invalid bet!");
+                    break;
+                case JackpotStatus.UnknownError:
+                    await ReplyAsync($"{Context.User.Mention} An unknown error occured!");
+                    break;
+                default:
+                    await ReplyAsync($"{Context.User.Mention} Total points: {jackpot.TotalPoints} | your total bet: {jackpot.Points} | your win percentage {jackpot.WinChancePercentage} %");
+                    break;
             }
         }
     }
