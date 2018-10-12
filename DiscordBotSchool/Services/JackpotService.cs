@@ -11,7 +11,7 @@ namespace DiscordBotSchool.Services
     public class JackpotService
     {
 
-        private readonly ulong CHANNEL_ID = 484640211519799308;
+        private readonly ulong CHANNEL_ID = 487166975794085888;
         private const int SECONDS = 5;
         private const int SECOND_ROTATIONS = 5;
         private readonly Timer _timer;
@@ -31,7 +31,9 @@ namespace DiscordBotSchool.Services
                         _timer.Change(Timeout.Infinite, Timeout.Infinite);
                         await chan.SendMessageAsync("Jackpot closed!");
                         TimerCompleted = 0;
-                        CloseJackpot();
+                        var jackpot = CloseJackpot();
+                        var user = await chan.GetUserAsync((ulong)jackpot.User.DiscordId);
+                        await chan.SendMessageAsync($"{user.Mention} has won the jackpot of {jackpot.TotalPoints} with {jackpot.WinChancePercentage}% chance to win!");
                     }
                     else
                     {
@@ -82,14 +84,14 @@ namespace DiscordBotSchool.Services
 
         }
 
-        private void CloseJackpot()
+        private BackendJackpot CloseJackpot()
         {
             // Actions should be queue'd but just to be sure..
             IsLocked = true;
             // API call
             string response = APIHelper.MakeGetRequest("gamble/endjackpot");
-            BackendJackpot jackpot = JsonConvert.DeserializeObject<BackendJackpot>(response);
             IsLocked = false;
+            return JsonConvert.DeserializeObject<BackendJackpot>(response);
         }
     }
 }
